@@ -4,7 +4,7 @@ import java.util.List;
 
 import open.source.google.map.clustering.model.Boundary;
 import open.source.google.map.clustering.model.ClusterConfiguration;
-import open.source.google.map.clustering.model.Point;
+import open.source.google.map.clustering.model.ClusterPoint;
 import open.source.google.map.clustering.util.BucketMapUtil;
 import open.source.google.map.clustering.util.Constants;
 
@@ -21,7 +21,7 @@ public class GridClusterAlgorithm {
 		this(Constants.DEFAULT_CONFIGURATION);
 	}
 
-	public List<Point> getClusteredMarkers(List<Point> points,
+	public List<ClusterPoint> getClusteredMarkers(List<ClusterPoint> points,
 			Boundary boundary, int zoomLevel) {
 		if (!clusterConfiguration.enableClusteringAlways()
 				&& zoomLevel >= clusterConfiguration.getZoomlevelClusterStop()) {

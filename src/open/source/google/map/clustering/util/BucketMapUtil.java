@@ -8,7 +8,7 @@ import java.util.Map;
 import open.source.google.map.clustering.model.Boundary;
 import open.source.google.map.clustering.model.Bucket;
 import open.source.google.map.clustering.model.ClusterConfiguration;
-import open.source.google.map.clustering.model.Point;
+import open.source.google.map.clustering.model.ClusterPoint;
 import open.source.google.map.clustering.util.MathUtil.DistanceCalculationMethod;
 
 public class BucketMapUtil {
@@ -25,8 +25,8 @@ public class BucketMapUtil {
 				.getDistanceCalculationMethod();
 	}
 
-	public List<Point> getClusterResult(List<Point> points, Boundary boundary,
-			int zoomLevel) {
+	public List<ClusterPoint> getClusterResult(List<ClusterPoint> points,
+			Boundary boundary, int zoomLevel) {
 		delta = LocationUtil
 				.getDelta(boundary, zoomLevel, clusterConfiguration);
 		Map<String, Bucket> bucketMap = prepareBucketMap(points, boundary,
@@ -97,7 +97,8 @@ public class BucketMapUtil {
 				continue;
 			current.getPoints().addAll(neighbor.getPoints());// O(n)
 			// recalc centroid
-			Point cp = PointUtil.getCentroidFromPoints(current.getPoints());
+			ClusterPoint cp = PointUtil.getCentroidFromPoints(current
+					.getPoints());
 			current.setCentroid(cp);
 			neighbor.setUsed(false); // merged, then not used anymore
 			neighbor.getPoints().clear(); // clear mem
@@ -126,13 +127,13 @@ public class BucketMapUtil {
 				|| bucket.getPoints() == null || bucket.getPoints().size() == 0) {
 			return;
 		}
-		Point closest = PointUtil.getNearestPoint(bucket.getCentroid(),
+		ClusterPoint closest = PointUtil.getNearestPoint(bucket.getCentroid(),
 				bucket.getPoints(), distanceCalculationMethod);
 		bucket.setCentroid(closest);
 	}
 
-	private List<Point> getClusterResult(Map<String, Bucket> bucketMap) {
-		List<Point> clusterPoints = new ArrayList<Point>();
+	private List<ClusterPoint> getClusterResult(Map<String, Bucket> bucketMap) {
+		List<ClusterPoint> clusterPoints = new ArrayList<ClusterPoint>();
 		for (Bucket bucket : bucketMap.values()) {
 			if (!bucket.isUsed())
 				continue;
@@ -147,14 +148,14 @@ public class BucketMapUtil {
 		return clusterPoints;
 	}
 
-	private Map<String, Bucket> prepareBucketMap(List<Point> points,
+	private Map<String, Bucket> prepareBucketMap(List<ClusterPoint> points,
 			Boundary boundary, int zoomLevel) {
 		boolean filterData = LocationUtil.canFilterData(zoomLevel);
 		Map<String, Bucket> bucketMap = new HashMap<String, Bucket>();
 
 		double deltax = delta[0];
 		double deltay = delta[1];
-		for (Point p : points) {
+		for (ClusterPoint p : points) {
 			int pointMappedId[] = null;
 			if (filterData && p.isInside(boundary)) {
 				pointMappedId = PointUtil.getPointMappedIds(p, boundary,

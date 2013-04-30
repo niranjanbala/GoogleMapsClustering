@@ -6,10 +6,10 @@ import java.util.List;
 public class Bucket {
 	private boolean isUsed;
 	private String id;
-	private List<Point> points;
+	private List<ClusterPoint> points;
 	int x;
 	int y;
-	private Point centroid;
+	private ClusterPoint centroid;
 	private double errorLevel;
 
 	public boolean isUsed() {
@@ -28,11 +28,11 @@ public class Bucket {
 		this.id = id;
 	}
 
-	public List<Point> getPoints() {
+	public List<ClusterPoint> getPoints() {
 		return points;
 	}
 
-	public void setPoints(List<Point> points) {
+	public void setPoints(List<ClusterPoint> points) {
 		this.points = points;
 	}
 
@@ -52,11 +52,11 @@ public class Bucket {
 		this.y = y;
 	}
 
-	public Point getCentroid() {
+	public ClusterPoint getCentroid() {
 		return centroid;
 	}
 
-	public void setCentroid(Point centroid) {
+	public void setCentroid(ClusterPoint centroid) {
 		this.centroid = centroid;
 	}
 
@@ -71,14 +71,14 @@ public class Bucket {
 	public Bucket(String id) {
 		this.isUsed = true;
 		this.centroid = null;
-		this.points = new ArrayList<Point>();
+		this.points = new ArrayList<ClusterPoint>();
 		this.id = id;
 	}
 
 	public Bucket(int x, int y, String id) {
 		this.isUsed = true;
 		this.centroid = null;
-		this.points = new ArrayList<Point>();
+		this.points = new ArrayList<ClusterPoint>();
 		this.x = x;
 		this.y = y;
 		this.id = id;

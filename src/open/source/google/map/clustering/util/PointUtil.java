@@ -6,16 +6,17 @@ import static open.source.google.map.clustering.util.MathUtil.radianToLatLon;
 import java.util.List;
 
 import open.source.google.map.clustering.model.Boundary;
-import open.source.google.map.clustering.model.Point;
+import open.source.google.map.clustering.model.ClusterPoint;
+import open.source.google.map.clustering.model.IPoint;
 import open.source.google.map.clustering.util.MathUtil.DistanceCalculationMethod;
 
 public class PointUtil {
 
-	public static Point getNearestPoint(Point from, List<Point> points,
-			DistanceCalculationMethod method) {
+	public static ClusterPoint getNearestPoint(ClusterPoint from,
+			List<ClusterPoint> points, DistanceCalculationMethod method) {
 		double min = Double.MAX_VALUE;
-		Point nearest = null;
-		for (Point p : points) {
+		ClusterPoint nearest = null;
+		for (ClusterPoint p : points) {
 			double d = MathUtil.distance(from, p, method);
 			if (d >= min) {
 				continue;
@@ -27,13 +28,14 @@ public class PointUtil {
 		return nearest;
 	}
 
-	public static Point getCentroidFromPoints(List<Point> points) {
+	public static ClusterPoint getCentroidFromPoints(List<ClusterPoint> points) {
 		int count = points.size();
 		if (points == null || points.isEmpty())
 			return null;
 		if (count == 1) {
 			return points.get(0);
 		}
+
 		// http://en.wikipedia.org/wiki/Circular_mean
 		// http://stackoverflow.com/questions/491738/how-do-you-calculate-the-average-of-a-set-of-angles
 		/*
@@ -44,7 +46,7 @@ public class PointUtil {
 		double lonCos = 0;
 		double latSin = 0;
 		double latCos = 0;
-		for (Point p : points) {
+		for (IPoint p : points) {
 			lonSin += Math.sin(latLonToRadian(p.getX()));
 			lonCos += Math.cos(latLonToRadian(p.getX()));
 			latSin += Math.sin(latLonToRadian(p.getY()));
@@ -61,12 +63,14 @@ public class PointUtil {
 		}
 		double x = radianToLatLon(radx);
 		double y = radianToLatLon(rady);
-		Point point = new Point(x, y, 0, Constants.MARKER_CLUSTER_TYPE);
+		ClusterPoint point = points.get(0);
+		point.setX(x);
+		point.setY(y);
 		point.setCountCluster(count);
 		return point;
 	}
 
-	public static int[] getPointMappedIds(Point p, Boundary grid,
+	public static int[] getPointMappedIds(IPoint p, Boundary grid,
 			double deltax, double deltay) {
 		// TODO: double relativeX = p.getX() - grid.getMinx();
 		double relativeY = p.getY() - grid.getMiny();

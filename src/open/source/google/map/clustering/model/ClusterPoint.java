@@ -3,49 +3,12 @@ package open.source.google.map.clustering.model;
 import open.source.google.map.clustering.util.Constants;
 import open.source.google.map.clustering.util.MathUtil;
 
-public class Point implements IPoint {
+public abstract class ClusterPoint implements IPoint {
 
-	private double x;
-	private double y;
 	private int countCluster;
-	private int markerId;
-	private int markerType;
-	private String displayText;
 
-	public String getDisplayText() {
-		return displayText;
-	}
-
-	public void setDisplayText(String displayText) {
-		this.displayText = displayText;
-	}
-
-	public Point(double x, double y, int markerId, int markerType) {
-		super();
-		this.x = x;
-		this.y = y;
-		this.countCluster = 1;
-		this.markerId = markerId;
-		this.markerType = markerType;
-		this.displayText = "";
-	}
-
-	@Override
-	public double getX() {
-		return x;
-	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	@Override
-	public double getY() {
-		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
+	public ClusterPoint() {
+		countCluster = 1;
 	}
 
 	public int getCountCluster() {
@@ -56,25 +19,13 @@ public class Point implements IPoint {
 		this.countCluster = countCluster;
 	}
 
-	public int getMarkerId() {
-		return markerId;
+	public final boolean isClusterPoint() {
+		return this.countCluster > 1;
 	}
 
-	public void setMarkerId(int markerId) {
-		this.markerId = markerId;
-	}
-
-	public int getMarkerType() {
-		return markerType;
-	}
-
-	public void setMarkerType(int markerType) {
-		this.markerType = markerType;
-	}
-
-	public void normalize() {
-		this.y = MathUtil.normalizeLatitude(y);
-		this.x = MathUtil.normalizeLongitude(x);
+	public final void normalize() {
+		this.setY(MathUtil.normalizeLatitude(this.getY()));
+		this.setX(MathUtil.normalizeLongitude(this.getX()));
 	}
 
 	// / <summary>
@@ -89,7 +40,7 @@ public class Point implements IPoint {
 	// / /// <param name="isInsideDetectedX"></param>
 	// / /// <param name="isInsideDetectedY"></param>
 	// / <returns></returns>
-	public boolean isInside(Boundary boundary, boolean isInsideDetectedX,
+	public final boolean isInside(Boundary boundary, boolean isInsideDetectedX,
 			boolean isInsideDetectedY) {
 		// Normalize because of widen function, world wrapping might have
 		// occured
@@ -102,8 +53,8 @@ public class Point implements IPoint {
 		double nminy = boundary.getMiny();
 		double nmaxy = boundary.getMaxy();
 
-		double nx = x;
-		double ny = y;
+		double nx = this.getX();
+		double ny = this.getY();
 
 		boolean isX = isInsideDetectedX; // skip checking?
 		boolean isY = isInsideDetectedY;
@@ -163,7 +114,7 @@ public class Point implements IPoint {
 		return isX && isY;
 	}
 
-	public boolean isInside(Boundary b) {
+	public final boolean isInside(Boundary b) {
 		return isInside(b, false, false);
 	}
 

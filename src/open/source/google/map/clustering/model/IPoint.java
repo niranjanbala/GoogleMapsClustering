@@ -2,8 +2,11 @@ package open.source.google.map.clustering.model;
 
 public interface IPoint {
 
-	double getX();
+	public double getX();
 
-	double getY();
+	public double getY();
 
+	public void setX(double x);
+
+	public void setY(double y);
 }
