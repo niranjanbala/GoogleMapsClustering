@@ -1,319 +1,310 @@
 package open.source.google.map.clustering.algorithm;
 
-//public class GridCluster : ClusterAlgorithmBase
-//{
-//    // Absolut position
-//    protected readonly Boundary Grid = new Boundary();
-//
-//    // Bucket placement calc, grid cluster algo
-//    protected readonly double DeltaX;
-//    protected readonly double DeltaY;
-//
-//    public static Boundary GetBoundaryExtended(JsonGetMarkersReceive jsonReceive)
-//    {
-//        var deltas = GetDelta(jsonReceive);
-//        var deltaX = deltas[0];
-//        var deltaY = deltas[1];
-//
-//        // Grid with extended outer grid-area non-visible            
-//        var a = MathTool.FloorLatLon(jsonReceive.Viewport.Minx, deltaX) - deltaX * AlgoConfig.OuterGridExtend;
-//        var b = MathTool.FloorLatLon(jsonReceive.Viewport.Miny, deltaY) - deltaY * AlgoConfig.OuterGridExtend;
-//        var a2 = MathTool.FloorLatLon(jsonReceive.Viewport.Maxx, deltaX) + deltaX * (1 + AlgoConfig.OuterGridExtend);
-//        var b2 = MathTool.FloorLatLon(jsonReceive.Viewport.Maxy, deltaY) + deltaY * (1 + AlgoConfig.OuterGridExtend);
-//
-//        // Latitude is special with Google Maps, they don't wrap around, then do constrain
-//        b = MathTool.ConstrainLatitude(b);
-//        b2 = MathTool.ConstrainLatitude(b2);
-//
-//        var grid = new Boundary { Minx = a, Miny = b, Maxx = a2, Maxy = b2 };
-//        grid.Normalize();
-//        return grid;
-//    }
-//
-//
-//    public static double[] GetDelta(JsonGetMarkersReceive jsonReceive)
-//    {
-//        // Heuristic specific values and grid size dependent.
-//        // used in combination with zoom level.
-//
-//        // xZoomLevel1 and yZoomLevel1 is used to define the size of one grid-cell
-//
-//        // Absolute base value of longitude distance
-//        const int xZoomLevel1 = 480;
-//        // Absolute base value of latitude distance
-//        const int yZoomLevel1 = 240;
-//
-//        // Relative values, used for adjusting grid size
-//        var gridScaleX = AlgoConfig.Gridx;
-//        var gridScaleY = AlgoConfig.Gridy;
-//
-//        var x = MathTool.Half(xZoomLevel1, jsonReceive.Zoomlevel - 1) / gridScaleX;
-//        var y = MathTool.Half(yZoomLevel1, jsonReceive.Zoomlevel - 1) / gridScaleY;
-//        return new double[] { x, y };
-//    }
-//
-//    public List<Line> Lines { get; private set; }
-//
-//    public GridCluster(IPoints dataset, JsonGetMarkersReceive jsonReceive)
-//        : base(dataset)
-//    {
-//        // Important, set _delta and _grid values in constructor as first step
-//        var deltas = GetDelta(jsonReceive);
-//        DeltaX = deltas[0];
-//        DeltaY = deltas[1];
-//        Grid = GetBoundaryExtended(jsonReceive);
-//        Lines = new List<Line>();
-//
-//        if (AlgoConfig.DoShowGridLinesInGoogleMap) MakeLines(jsonReceive);
-//    }
-//
-//    void MakeLines(JsonGetMarkersReceive jsonReceive)
-//    {
-//        if(!jsonReceive.IsDebugLinesEnabled) return; // client disabled it
-//
-//
-//
-//        // Make the red lines data to be drawn in Google map
-//        
-//        var temp = new List<Rectangle>();
-//
-//        const int borderLinesAdding = 1;
-//        var linesStepsX = (int)(Math.Round(Grid.AbsX / DeltaX) + borderLinesAdding);
-//        var linesStepsY = (int)(Math.Round(Grid.AbsY / DeltaY) + borderLinesAdding);
-//
-//        var b = new Boundary(Grid);
-//        const double restrictLat = 5.5;
-//        b.Miny = MathTool.ConstrainLatitude(b.Miny, restrictLat); // Make sure it is visible on screen, restrict by some value
-//        b.Maxy = MathTool.ConstrainLatitude(b.Maxy, restrictLat);
-//
-//        // Vertical lines
-//        for (var i = 0; i < linesStepsX; i++)
-//        {
-//            var xx  = b.Minx + i * DeltaX;
-//            
-//            // Draw region
-//            if (jsonReceive.Zoomlevel > 3)
-//            {
-//                temp.Add(new Rectangle { Minx = xx, Miny = b.Miny, Maxx = xx, Maxy = b.Maxy });
-//            }
-//            // World wrap issue when same latlon area visible multiple times
-//            // Make sure line is drawn from left to right on screen
-//            else
-//            {
-//                temp.Add(new Rectangle { Minx = xx, Miny = LatLonInfo.MinLatValue + restrictLat, Maxx = xx, Maxy = 0 });
-//                temp.Add(new Rectangle { Minx = xx, Miny = 0, Maxx = xx, Maxy = LatLonInfo.MaxLatValue-restrictLat });
-//            }
-//
-//        }
-//
-//        // Horizontal lines            
-//        for (var i = 0; i < linesStepsY; i++)
-//        {
-//            var yy = b.Miny + i * DeltaY;
-//                            
-//            // Draw region
-//            if (jsonReceive.Zoomlevel > 3)
-//            {
-//                // Don't draw lines outsize the world
-//                if (MathTool.IsLowerThanLatMin(yy) || MathTool.IsGreaterThanLatMax(yy)) continue;
-//
-//                temp.Add(new Rectangle { Minx = b.Minx, Miny = yy, Maxx = b.Maxx, Maxy = yy });
-//            }                
-//            // World wrap issue when same latlon area visible multiple times
-//            // Make sure line is drawn from left to right on screen
-//            else
-//            {
-//                temp.Add(new Rectangle { Minx = LatLonInfo.MinLonValue, Miny = yy, Maxx = 0, Maxy = yy });
-//                temp.Add(new Rectangle { Minx = 0, Miny = yy, Maxx = LatLonInfo.MaxLonValue, Maxy = yy });
-//            }
-//        }
-//
-//        // Normalize the lines and add as string
-//        foreach (var line in temp)
-//        {
-//            var x = (line.Minx).NormalizeLongitude().DoubleToString();
-//            var x2 = (line.Maxx).NormalizeLongitude().DoubleToString();
-//            var y = (line.Miny).NormalizeLatitude().DoubleToString();
-//            var y2 = (line.Maxy).NormalizeLatitude().DoubleToString();                
-//            Lines.Add(new Line { X = x, Y = y, X2 = x2, Y2 = y2 });
-//        }
-//    }
-//   
-//
-//    public override IPoints GetCluster(ClusterInfo clusterInfo)
-//    {
-//        return RunClusterAlgo(clusterInfo);
-//    }
-//
-//
-//    // Dictionary lookup key used by grid cluster algo
-//    public static string GetId(int idx, int idy) //O(1)
-//    {
-//        return idx + ";" + idy;
-//    }
-//
-//    // Average running time (m*n)
-//    // worst case might actually be 
-//    // ~ O(n^2) if most of centroids are merged, due to centroid re-calculation, very very unlikely
-//    void MergeClustersGrid()
-//    {
-//        foreach (var key in BucketsLookup.Keys)
-//        {
-//            var bucket = BucketsLookup[key];
-//            if (!bucket.IsUsed) continue; // skip not used
-//
-//            var x = bucket.Idx;
-//            var y = bucket.Idy;
-//
-//            // get keys for neighbors
-//            var N = GetId(x, y + 1);
-//            var NE = GetId(x + 1, y + 1);
-//            var E = GetId(x + 1, y);
-//            var SE = GetId(x + 1, y - 1);
-//            var S = GetId(x, y - 1);
-//            var SW = GetId(x - 1, y - 1);
-//            var W = GetId(x - 1, y);
-//            var NW = GetId(x - 1, y - 1);
-//            var neighbors = new[] { N, NE, E, SE, S, SW, W, NW };
-//
-//            MergeClustersGridHelper(key, neighbors);
-//        }
-//    }
-//    void MergeClustersGridHelper(string currentKey, IEnumerable<string> neighborKeys)
-//    {
-//        double minDistX = DeltaX / AlgoConfig.MergeWithin;
-//        double minDistY = DeltaY / AlgoConfig.MergeWithin;
-//        // If clusters in grid are too close to each other, merge them
-//        double withinDist = Math.Max(minDistX, minDistY);
-//
-//        foreach (var neighborKey in neighborKeys)
-//        {
-//            if (!BucketsLookup.ContainsKey(neighborKey)) continue;
-//
-//            var neighbor = BucketsLookup[neighborKey];
-//            if (neighbor.IsUsed == false) continue;
-//
-//            var current = BucketsLookup[currentKey];
-//            var dist = MathTool.Distance(current.Centroid, neighbor.Centroid);
-//            if (dist > withinDist) continue;
-//
-//            current.Points.Data.AddRange(neighbor.Points.Data);//O(n)
-//
-//            // recalc centroid
-//            var cp = GetCentroidFromClusterLatLon(current.Points);
-//            current.Centroid = cp;
-//            neighbor.IsUsed = false; // merged, then not used anymore
-//            neighbor.Points.Data.Clear(); // clear mem
-//        }
-//    }
-//
-//    // To work properly it requires the p is already normalized
-//    public static int[] GetPointMappedIds(IP p, Boundary grid, double deltax, double deltay)
-//    {
-//        var relativeX = p.X - grid.Minx;
-//        var relativeY = p.Y - grid.Miny;
-//        int idx, idy;
-//
-//        // Naive version, lon points near 180 and lat points near 90 are not clustered together
-//        //idx = (int)(relativeX / deltax);
-//        //idy = (int)(relativeY / deltay);
-//        // end Naive version
-//
-//        /*
-//        You have to draw a line with longitude values 180, -180 on papir to understand this            
-//            
-//         e.g. _deltaX = 20
-//longitude        150   170  180  -170   -150
-//             |      |          |     |
-//             
-//   
-//idx =         7      8    9    -9    -8
-//                        -10    
-//                              
-//here we want idx 8, 9, -10 and -9 be equal to each other, we set them to idx=8
-//then the longitudes from 170 to -170 will be clustered together
-//         */
-//
-//        var overlapMapMinX = (int)(LatLonInfo.MinLonValue / deltax) - 1;
-//        var overlapMapMaxX = (int)(LatLonInfo.MaxLonValue / deltax);
-//
-//        // The deltaX = 20 example scenario, then set the value 9 to 8 and -10 to -9            
-//
-//        // Similar to if (LatLonInfo.MaxLonValue % deltax == 0) without floating presicion issue
-//        if (Math.Abs(LatLonInfo.MaxLonValue % deltax - 0) < Numbers.Epsilon)
-//        {
-//            overlapMapMaxX--;
-//            overlapMapMinX++;
-//        }
-//
-//        var idxx = (int)(p.X / deltax);
-//        if (p.X < 0) idxx--;
-//
-//        if (Math.Abs(LatLonInfo.MaxLonValue % p.X - 0) < Numbers.Epsilon)
-//        {
-//            if (p.X < 0) idxx++;
-//            else idxx--;
-//        }
-//
-//        if (idxx == overlapMapMinX) idxx = overlapMapMaxX;
-//
-//        idx = idxx;
-//
-//        // Latitude never wraps around with Google Maps, ignore 90, -90 wrap-around for latitude
-//        idy = (int)(relativeY / deltay);
-//
-//        return new[] { idx, idy };
-//    }
-//
-//
-//    public IPoints RunClusterAlgo(ClusterInfo clusterInfo)
-//    {
-//        // Skip points outside the grid
-//        IPoints filtered = clusterInfo.IsFilterData ? FilterDataset(Dataset, Grid) : Dataset;
-//
-//        // Put points in buckets
-//        foreach (var p in filtered.Data)
-//        {
-//            var idxy = GetPointMappedIds(p, Grid, DeltaX, DeltaY);
-//            var idx = idxy[0];
-//            var idy = idxy[1];
-//
-//            // Bucket id
-//            var id = GetId(idx, idy);
-//
-//            // Bucket exists, add point
-//            if (BucketsLookup.ContainsKey(id))
-//            {
-//                BucketsLookup[id].Points.Add(p);
-//            }
-//            // New bucket, create and add point
-//            else
-//            {
-//                var bucket = new Bucket(idx, idy, id);
-//                bucket.Points.Add(p);
-//                BucketsLookup.Add(id, bucket);
-//            }
-//        }
-//
-//        // Calculate centroid for all buckets
-//        SetCentroidForAllBuckets(BucketsLookup.Values);
-//
-//        // Merge if gridpoint is to close
-//        if (AlgoConfig.DoMergeGridIfCentroidsAreCloseToEachOther) MergeClustersGrid();
-//
-//        if (AlgoConfig.DoUpdateAllCentroidsToNearestContainingPoint) UpdateAllCentroidsToNearestContainingPoint();
-//
-//        // Check again
-//        // Merge if gridpoint is to close
-//        if (AlgoConfig.DoMergeGridIfCentroidsAreCloseToEachOther
-//            && AlgoConfig.DoUpdateAllCentroidsToNearestContainingPoint)
-//        {
-//            MergeClustersGrid();
-//            // And again set centroid to closest point in bucket 
-//            UpdateAllCentroidsToNearestContainingPoint();
-//        }
-//
-//        return GetClusterResult(Grid);
-//    }
-//}
-//}
+import static open.source.google.map.clustering.util.MathUtil.latLonToRadian;
+import static open.source.google.map.clustering.util.MathUtil.radianToLatLon;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import open.source.google.map.clustering.model.Boundary;
+import open.source.google.map.clustering.model.Bucket;
+import open.source.google.map.clustering.model.ClusterConfiguration;
+import open.source.google.map.clustering.model.Point;
+import open.source.google.map.clustering.util.Constants;
+import open.source.google.map.clustering.util.LocationUtil;
+import open.source.google.map.clustering.util.MathUtil;
+
+public class GridClusterAlgorithm {
+	private ClusterConfiguration clusterConfiguration;
+	private double delta[];
+
+	public GridClusterAlgorithm(ClusterConfiguration clusterConfiguration) {
+		this.clusterConfiguration = clusterConfiguration;
+	}
+
+	public List<Point> getClusteredMarkers(List<Point> points,
+			Boundary boundary, int zoomLevel) {
+		delta = LocationUtil
+				.getDelta(boundary, zoomLevel, clusterConfiguration);
+		Map<String, Bucket> bucketMap = prepareBucketMap(points, boundary,
+				zoomLevel);
+		setCentroidForAllBuckets(bucketMap);
+		// Merge if gridpoint is to close
+		if (clusterConfiguration.isDoMergeGridIfCentroidsAreCloseToEachOther()) {
+			mergeClustersGrid(bucketMap);
+		}
+		if (clusterConfiguration
+				.isDoUpdateAllCentroidsToNearestContainingPoint()) {
+			updateAllCentroidsToNearestContainingPoint(bucketMap);
+		}
+		// // Check again
+		// // Merge if gridpoint is to close
+		if (clusterConfiguration.isDoMergeGridIfCentroidsAreCloseToEachOther()
+				&& clusterConfiguration
+						.isDoUpdateAllCentroidsToNearestContainingPoint()) {
+			mergeClustersGrid(bucketMap);
+			// And again set centroid to closest point in bucket
+			updateAllCentroidsToNearestContainingPoint(bucketMap);
+		}
+		return getClusterResult(bucketMap);
+	}
+
+	private void updateAllCentroidsToNearestContainingPoint(
+			Map<String, Bucket> bucketMap) {
+		for (Bucket bucket : bucketMap.values()) {
+			updateCentroidToNearestContainingPoint(bucket);
+		}
+
+	}
+
+	// // Update centroid location to nearest point,
+	// // e.g. if you want to show cluster point on a real existing point area
+	// // O(n)
+	public void updateCentroidToNearestContainingPoint(Bucket bucket) {
+		if (bucket == null || bucket.getCentroid() == null
+				|| bucket.getPoints() == null || bucket.getPoints().size() == 0) {
+			return;
+		}
+
+		Point closest = getNearestPoint(bucket.getCentroid(),
+				bucket.getPoints());
+		bucket.setCentroid(closest);
+	}
+
+	private Point getNearestPoint(Point from, List<Point> points) {
+		double min = Double.MAX_VALUE;
+		Point nearest = null;
+		for (Point p : points) {
+			double d = MathUtil.distance(from, p);
+			if (d >= min) {
+				continue;
+			}
+			// update
+			min = d;
+			nearest = p;
+		}
+		return nearest;
+	}
+
+	private void mergeClustersGrid(Map<String, Bucket> bucketMap) {
+		for (String key : bucketMap.keySet()) {
+			Bucket bucket = bucketMap.get(key);
+			if (!bucket.isUsed()) {
+				continue;
+			}
+			int x = bucket.getX();
+			int y = bucket.getY();
+
+			// get keys for neighbors
+			String N = getKey(x, y + 1);
+			String NE = getKey(x + 1, y + 1);
+			String E = getKey(x + 1, y);
+			String SE = getKey(x + 1, y - 1);
+			String S = getKey(x, y - 1);
+			String SW = getKey(x - 1, y - 1);
+			String W = getKey(x - 1, y);
+			String NW = getKey(x - 1, y - 1);
+			String neighbors[] = { N, NE, E, SE, S, SW, W, NW };
+			mergeClustersGridHelper(key, neighbors, bucketMap);
+		}
+
+	}
+
+	private void mergeClustersGridHelper(String currentKey, String[] neighbors,
+			Map<String, Bucket> bucketMap) {
+		double minDistX = delta[0] / clusterConfiguration.getMergeWithin();
+		double minDistY = delta[1] / clusterConfiguration.getMergeWithin();
+		// If clusters in grid are too close to each other, merge them
+		double withinDist = Math.max(minDistX, minDistY);
+
+		for (String neighborKey : neighbors) {
+			if (!bucketMap.containsKey(neighborKey))
+				continue;
+
+			Bucket neighbor = bucketMap.get(neighborKey);
+			if (!neighbor.isUsed())
+				continue;
+			Bucket current = bucketMap.get(currentKey);
+			double dist = MathUtil.distance(current.getCentroid(),
+					neighbor.getCentroid());
+			if (dist > withinDist)
+				continue;
+			current.getPoints().addAll(neighbor.getPoints());// O(n)
+			// recalc centroid
+			Point cp = getCentroidFromPoints(current.getPoints());
+			current.setCentroid(cp);
+			neighbor.setUsed(false); // merged, then not used anymore
+			neighbor.getPoints().clear(); // clear mem
+		}
+
+	}
+
+	private String getKey(int x, int y) {
+		return x + "-" + y;
+	}
+
+	private Map<String, Bucket> prepareBucketMap(List<Point> points,
+			Boundary boundary, int zoomLevel) {
+		boolean filterData = LocationUtil.canFilterData(zoomLevel);
+		Map<String, Bucket> bucketMap = new HashMap<String, Bucket>();
+
+		double deltax = delta[0];
+		double deltay = delta[1];
+		for (Point p : points) {
+			int pointMappedId[] = null;
+			if (filterData && withinBoundary(p, boundary)) {
+				pointMappedId = getPointMappedIds(p, boundary, deltax, deltay);
+			} else {
+				pointMappedId = getPointMappedIds(p, boundary, deltax, deltay);
+			}
+			if (pointMappedId != null) {
+				String key = getKey(pointMappedId[0], pointMappedId[1]);
+				if (bucketMap.containsKey(key)) {
+					bucketMap.get(key).getPoints().add(p);
+				} else {
+					Bucket b = new Bucket(pointMappedId[0], pointMappedId[1],
+							key);
+					b.getPoints().add(p);
+					bucketMap.put(key, b);
+				}
+			}
+		}
+		return bucketMap;
+	}
+
+	private List<Point> getClusterResult(Map<String, Bucket> bucketMap) {
+		List<Point> clusterPoints = new ArrayList<Point>();
+		for (Bucket bucket : bucketMap.values()) {
+			if (!bucket.isUsed())
+				continue;
+			if (bucket.getPoints().size() < clusterConfiguration
+					.getMinClusterSize())
+				clusterPoints.addAll(bucket.getPoints());
+			else {
+				bucket.getCentroid().setCountCluster(bucket.getPoints().size());
+				clusterPoints.add(bucket.getCentroid());
+			}
+		}
+		return clusterPoints;
+	}
+
+	private void setCentroidForAllBuckets(Map<String, Bucket> bucketMap) {
+		for (Bucket bucket : bucketMap.values()) {
+			bucket.setCentroid(getCentroidFromPoints(bucket.getPoints()));
+		}
+	}
+
+	private Point getCentroidFromPoints(List<Point> points) {
+		int count = points.size();
+		if (points == null || points.isEmpty())
+			return null;
+
+		if (count == 1) {
+			return points.get(0);
+		}
+
+		// http://en.wikipedia.org/wiki/Circular_mean
+		// http://stackoverflow.com/questions/491738/how-do-you-calculate-the-average-of-a-set-of-angles
+		/*
+		 * 1/N* sum_i_from_1_to_N sin(a[i]) a = atan2
+		 * --------------------------- 1/N* sum_i_from_1_to_N cos(a[i])
+		 */
+
+		double lonSin = 0;
+		double lonCos = 0;
+		double latSin = 0;
+		double latCos = 0;
+		for (Point p : points) {
+			lonSin += Math.sin(latLonToRadian(p.getX()));
+			lonCos += Math.cos(latLonToRadian(p.getX()));
+			latSin += Math.sin(latLonToRadian(p.getY()));
+			latCos += Math.cos(latLonToRadian(p.getY()));
+		}
+
+		lonSin /= count;
+		lonCos /= count;
+
+		double radx = 0;
+		double rady = 0;
+
+		if (Math.abs(lonSin - 0) > Constants.EPSILON
+				&& Math.abs(lonCos - 0) > Constants.EPSILON) {
+			radx = Math.atan2(lonSin, lonCos);
+			rady = Math.atan2(latSin, latCos);
+		}
+		double x = radianToLatLon(radx);
+		double y = radianToLatLon(rady);
+		Point point = new Point();
+		point.setX(x);
+		point.setY(y);
+		point.setCountCluster(count);
+		return point;
+	}
+
+	private int[] getPointMappedIds(Point p, Boundary grid, double deltax,
+			double deltay) {
+		// TODO: double relativeX = p.getX() - grid.getMinx();
+		double relativeY = p.getY() - grid.getMiny();
+		double idx, idy;
+
+		// Naive version, lon points near 180 and lat points near 90 are not
+		// clustered together
+		// idx = (int)(relativeX / deltax);
+		// idy = (int)(relativeY / deltay);
+		// end Naive version
+
+		/*
+		 * You have to draw a line with longitude values 180, -180 on papir to
+		 * understand this
+		 * 
+		 * e.g. _deltaX = 20 longitude 150 170 180 -170 -150 | | | |
+		 * 
+		 * 
+		 * idx = 7 8 9 -9 -8 -10
+		 * 
+		 * here we want idx 8, 9, -10 and -9 be equal to each other, we set them
+		 * to idx=8 then the longitudes from 170 to -170 will be clustered
+		 * together
+		 */
+		double overlapMapMinX = (int) (LocationUtil.MIN_LON_VALUE / deltax) - 1;
+		double overlapMapMaxX = (int) (LocationUtil.MAX_LON_VALUE / deltax);
+
+		// The deltaX = 20 example scenario, then set the value 9 to 8 and -10
+		// to -9
+
+		// Similar to if (LatLonInfo.MaxLonValue % deltax == 0) without floating
+		// presicion issue
+		if (Math.abs(LocationUtil.MAX_LON_VALUE % deltax - 0) < Constants.EPSILON) {
+			overlapMapMaxX--;
+			overlapMapMinX++;
+		}
+
+		double idxx = (int) (p.getX() / deltax);
+		if (p.getX() < 0)
+			idxx--;
+
+		if (Math.abs(LocationUtil.MAX_LON_VALUE % p.getX() - 0) < Constants.EPSILON) {
+			if (p.getX() < 0)
+				idxx++;
+			else
+				idxx--;
+		}
+
+		if (idxx == overlapMapMinX)
+			idxx = overlapMapMaxX;
+
+		idx = idxx;
+
+		// Latitude never wraps around with Google Maps, ignore 90, -90
+		// wrap-around for latitude
+		idy = (int) (relativeY / deltay);
+
+		return new int[] { (int) idx, (int) idy };
+	}
+
+	private boolean withinBoundary(Point p, Boundary boundary) {
+		return LocationUtil.IsInside(boundary, p);
+	}
+}
