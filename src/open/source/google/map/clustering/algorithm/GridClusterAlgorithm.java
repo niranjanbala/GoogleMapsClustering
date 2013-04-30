@@ -30,6 +30,10 @@ public class GridClusterAlgorithm {
 
 	public List<Point> getClusteredMarkers(List<Point> points,
 			Boundary boundary, int zoomLevel) {
+		if (!clusterConfiguration.enableClusteringAlways()
+				&& zoomLevel >= clusterConfiguration.getZoomlevelClusterStop()) {
+			return points;
+		}
 		delta = LocationUtil
 				.getDelta(boundary, zoomLevel, clusterConfiguration);
 		Map<String, Bucket> bucketMap = prepareBucketMap(points, boundary,

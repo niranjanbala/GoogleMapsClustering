@@ -3,28 +3,27 @@ package open.source.google.map.clustering.model;
 import open.source.google.map.clustering.util.MathUtil.DistanceCalculationMethod;
 
 public class ClusterConfiguration {
-	private int gridx;// used
-	private int gridy;// used
-	private boolean doShowGridLinesInGoogleMap;
-	private int outerGridExtend;
-	private boolean doUpdateAllCentroidsToNearestContainingPoint;// used
-	private boolean doMergeGridIfCentroidsAreCloseToEachOther;// used
-	private int mergeWithin;// used
-	private int minClusterSize;// used
-	private int maxMarkersReturned;
-	private boolean alwaysClusteringEnabledWhenZoomLevelLess;
+	private int gridx;
+	private int gridy;
+	private boolean doUpdateAllCentroidsToNearestContainingPoint;
+	private boolean doMergeGridIfCentroidsAreCloseToEachOther;
+	private int mergeWithin;
+	private int minClusterSize;
 	private int zoomlevelClusterStop;
-	private String environment;
-	private boolean preClustered;
 	private DistanceCalculationMethod distanceCalculationMethod;
+	private boolean alwaysClusteringEnabled;
+	private boolean doShowGridLinesInGoogleMap;// UNUSED
+	private int outerGridExtend;// UNUSED
+	private int maxMarkersReturned;// UNUSED
+	private boolean preClustered;// UNUSED
 
 	public ClusterConfiguration(int gridx, int gridy,
 			boolean doShowGridLinesInGoogleMap, int outerGridExtend,
 			boolean doUpdateAllCentroidsToNearestContainingPoint,
 			boolean doMergeGridIfCentroidsAreCloseToEachOther, int mergeWithin,
 			int minClusterSize, int maxMarkersReturned,
-			boolean alwaysClusteringEnabledWhenZoomLevelLess,
-			int zoomlevelClusterStop, String environment, boolean preClustered,
+			boolean alwaysClusteringEnabled, int zoomlevelClusterStop,
+			boolean preClustered,
 			DistanceCalculationMethod distanceCalculationMethod) {
 		super();
 		this.gridx = gridx;
@@ -36,9 +35,8 @@ public class ClusterConfiguration {
 		this.mergeWithin = mergeWithin;
 		this.minClusterSize = minClusterSize;
 		this.maxMarkersReturned = maxMarkersReturned;
-		this.alwaysClusteringEnabledWhenZoomLevelLess = alwaysClusteringEnabledWhenZoomLevelLess;
+		this.alwaysClusteringEnabled = alwaysClusteringEnabled;
 		this.zoomlevelClusterStop = zoomlevelClusterStop;
-		this.environment = environment;
 		this.preClustered = preClustered;
 		this.distanceCalculationMethod = distanceCalculationMethod;
 	}
@@ -83,16 +81,12 @@ public class ClusterConfiguration {
 		return maxMarkersReturned;
 	}
 
-	public boolean isAlwaysClusteringEnabledWhenZoomLevelLess() {
-		return alwaysClusteringEnabledWhenZoomLevelLess;
+	public boolean enableClusteringAlways() {
+		return alwaysClusteringEnabled;
 	}
 
 	public int getZoomlevelClusterStop() {
 		return zoomlevelClusterStop;
-	}
-
-	public String getEnvironment() {
-		return environment;
 	}
 
 	public boolean isPreClustered() {

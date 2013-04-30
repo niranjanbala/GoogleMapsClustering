@@ -9,7 +9,7 @@ public class Constants {
 	public static final double EPSILON = 0.0000000001;
 	public static final int ROUND = 6; // lat lon, 1 meter precision
 	public static final ClusterConfiguration DEFAULT_CONFIGURATION = new ClusterConfiguration(
-			6, 5, true, 0, false, true, 3, 10, 500, false, 15, "dev", false,
+			6, 5, true, 0, false, true, 3, 10, 500, false, 15, false,
 			DistanceCalculationMethod.DEFAULT);
 	public static final double MIN_LAT_VALUE = -90;
 	public static final double MAX_LAT_VALUE = 90;
