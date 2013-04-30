@@ -27,4 +27,5 @@ public class Constants {
 	public static DecimalFormat FORMATTER = new DecimalFormat("#0.####");
 	public static DecimalFormat ROUND_CONVERT_ERROR = new DecimalFormat(
 			"#0.#####");
+	public static int MARKER_CLUSTER_TYPE = 1;
 }

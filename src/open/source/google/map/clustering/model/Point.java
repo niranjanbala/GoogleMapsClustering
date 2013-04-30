@@ -10,6 +10,15 @@ public class Point {
 	private int countCluster;
 	private int markerId;
 	private int markerType;
+	private String displayText;
+
+	public String getDisplayText() {
+		return displayText;
+	}
+
+	public void setDisplayText(String displayText) {
+		this.displayText = displayText;
+	}
 
 	public Point(double x, double y, int markerId, int markerType) {
 		super();
@@ -18,6 +27,7 @@ public class Point {
 		this.countCluster = 1;
 		this.markerId = markerId;
 		this.markerType = markerType;
+		this.displayText = "";
 	}
 
 	public double getX() {
