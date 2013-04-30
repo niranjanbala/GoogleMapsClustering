@@ -1,16 +1,8 @@
 package open.source.google.map.clustering.util;
 
-import java.text.DecimalFormat;
-
 import open.source.google.map.clustering.model.Point;
 
 public class MathUtil {
-	private static final double Exp = 2; // 2=euclid, 1=manhatten
-	private static final double Pi2 = Math.PI * 2;
-	private static DecimalFormat FORMATTER = new DecimalFormat("#0.####");
-	private static DecimalFormat ROUND_CONVERT_ERROR = new DecimalFormat(
-			"#0.#####");
-
 	// Minkowski dist
 	// if lat lon precise dist is needed, use Haversine or similar formulas
 	// is approx calc for clustering, no precise dist is needed
@@ -20,17 +12,19 @@ public class MathUtil {
 		double absx = latLonDiff(a.getX(), b.getX());
 		double absy = latLonDiff(a.getY(), b.getY());
 
-		return Math.pow(Math.pow(absx, Exp) + Math.pow(Math.abs(absy), Exp),
-				1.0 / Exp);
+		return Math.pow(
+				Math.pow(absx, Constants.EXP)
+						+ Math.pow(Math.abs(absy), Constants.EXP),
+				1.0 / Constants.EXP);
 	}
 
 	// O(1) while loop is maximum 2
 	public static double latLonDiff(double from, double to) {
 		double difference = to - from;
-		while (difference < -LocationUtil.MAX_LENGTH_WRAP)
-			difference += LocationUtil.MAX_WORD_LENGTH;
-		while (difference > LocationUtil.MAX_LENGTH_WRAP)
-			difference -= LocationUtil.MAX_WORD_LENGTH;
+		while (difference < -Constants.MAX_LENGTH_WRAP)
+			difference += Constants.MAX_WORD_LENGTH;
+		while (difference > Constants.MAX_LENGTH_WRAP)
+			difference -= Constants.MAX_WORD_LENGTH;
 		return Math.abs(difference);
 
 		// double differenceAngle = (to - from) % 180; //not working for -170 to
@@ -83,11 +77,11 @@ public class MathUtil {
 	}
 
 	public static boolean isLowerThanLatMin(double d) {
-		return d < LocationUtil.MIN_LAT_VALUE;
+		return d < Constants.MIN_LAT_VALUE;
 	}
 
 	public static boolean isGreaterThanLatMax(double d) {
-		return d > LocationUtil.MAX_LAT_VALUE;
+		return d > Constants.MAX_LAT_VALUE;
 	}
 
 	// used by zoom level and deciding the grid size, O(halfSteps)
@@ -103,7 +97,7 @@ public class MathUtil {
 		}
 
 		// TODO: double halfRounded = Math.round(half, 4);
-		double halfRounded = Double.valueOf(FORMATTER.format(half));
+		double halfRounded = Double.valueOf(Constants.FORMATTER.format(half));
 		// avoid grid span less than level
 		return halfRounded < meter11 ? meter11 : halfRounded;
 	}
@@ -125,13 +119,11 @@ public class MathUtil {
 
 	//
 	public static boolean isLatValid(double d) {
-		return LocationUtil.MIN_LAT_VALUE <= d
-				&& d <= LocationUtil.MAX_LAT_VALUE;
+		return Constants.MIN_LAT_VALUE <= d && d <= Constants.MAX_LAT_VALUE;
 	}
 
 	public static boolean isLonValid(double d) {
-		return LocationUtil.MIN_LON_VALUE <= d
-				&& d <= LocationUtil.MAX_LON_VALUE;
+		return Constants.MIN_LON_VALUE <= d && d <= Constants.MAX_LON_VALUE;
 	}
 
 	// Value must be within a and b
@@ -141,8 +133,8 @@ public class MathUtil {
 
 	// Value must be within latitude boundary
 	public static double constrainLatitude(double x, double offset) {
-		return Math.max(LocationUtil.MIN_LAT_VALUE + offset,
-				Math.min(x, LocationUtil.MAX_LAT_VALUE - offset));
+		return Math.max(Constants.MIN_LAT_VALUE + offset,
+				Math.min(x, Constants.MAX_LAT_VALUE - offset));
 	}
 
 	// Distance
@@ -150,11 +142,11 @@ public class MathUtil {
 		double b = beg;
 		double e = end;
 		if (b > e) {
-			e += LocationUtil.MAX_LAT_LENGTH;
+			e += Constants.MAX_LAT_LENGTH;
 		}
 
 		double diff = e - b;
-		if (diff < 0 || diff > LocationUtil.MAX_LAT_LENGTH) {
+		if (diff < 0 || diff > Constants.MAX_LAT_LENGTH) {
 			throw new IllegalArgumentException(String.format(
 					"Error AbsLat beg: {%f} end: {%f}", beg, end));
 		}
@@ -167,10 +159,10 @@ public class MathUtil {
 		double b = beg;
 		double e = end;
 		if (b > e) {
-			e += LocationUtil.MAX_LON_LENGTH;
+			e += Constants.MAX_LON_LENGTH;
 		}
 		double diff = e - b;
-		if (diff < 0 || diff > LocationUtil.MAX_LON_LENGTH) {
+		if (diff < 0 || diff > Constants.MAX_LON_LENGTH) {
 			throw new IllegalArgumentException(String.format(
 					"Error AbsLat beg: {%f} end: {%f}", beg, end));
 		}
@@ -180,13 +172,13 @@ public class MathUtil {
 
 	// positive version of lat, lon
 	public static double positive(double latlon) {
-		if (latlon < LocationUtil.MIN_LON_VALUE
-				|| latlon > LocationUtil.MAX_LON_VALUE) {
+		if (latlon < Constants.MIN_LON_VALUE
+				|| latlon > Constants.MAX_LON_VALUE) {
 			throw new IllegalArgumentException("Pos");
 		}
 
 		if (latlon < 0) {
-			return latlon + LocationUtil.MAX_WORD_LENGTH;
+			return latlon + Constants.MAX_WORD_LENGTH;
 		}
 
 		return latlon;
@@ -194,13 +186,13 @@ public class MathUtil {
 
 	// Lat or Lon
 	public static double latLonToDegree(double latlon) {
-		if (latlon < LocationUtil.MIN_LON_VALUE
-				|| latlon > LocationUtil.MAX_LON_VALUE) {
+		if (latlon < Constants.MIN_LON_VALUE
+				|| latlon > Constants.MAX_LON_VALUE) {
 			throw new IllegalArgumentException("LatLonToDegree");
 		}
 
-		return (latlon + LocationUtil.ANGLE_CONVERT + LocationUtil.MAX_WORD_LENGTH)
-				% LocationUtil.MAX_WORD_LENGTH;
+		return (latlon + Constants.ANGLE_CONVERT + Constants.MAX_WORD_LENGTH)
+				% Constants.MAX_WORD_LENGTH;
 	}
 
 	public static double degreeToLatLon(double degree) {
@@ -208,12 +200,12 @@ public class MathUtil {
 			throw new IllegalArgumentException("DegreeToLatLon");
 		}
 
-		return (degree - LocationUtil.ANGLE_CONVERT);
+		return (degree - Constants.ANGLE_CONVERT);
 	}
 
 	public static double latLonToRadian(double latlon) {
-		if (latlon < LocationUtil.MIN_LON_VALUE
-				|| latlon > LocationUtil.MAX_LON_VALUE) {
+		if (latlon < Constants.MIN_LON_VALUE
+				|| latlon > Constants.MAX_LON_VALUE) {
 			throw new IllegalArgumentException("LatLonToRadian");
 		}
 
@@ -223,12 +215,12 @@ public class MathUtil {
 	}
 
 	public static double radianNormalize(double r) {
-		if (r < -Pi2 || r > Pi2) {
+		if (r < -Constants.PI_SQUARE || r > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianNormalize");
 		}
 
-		double radian = (r + Pi2) % Pi2;
-		if (radian < 0 || radian > Pi2) {
+		double radian = (r + Constants.PI_SQUARE) % Constants.PI_SQUARE;
+		if (radian < 0 || radian > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianNormalize");
 		}
 
@@ -250,20 +242,20 @@ public class MathUtil {
 
 	public static double radianToLatLon(double r) {
 		double radian = radianNormalize(r);
-		if (radian < 0 || radian > Pi2) {
+		if (radian < 0 || radian > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianToLatLon");
 		}
 
 		double degree = degreeNormalize(radianToDegree(radian));
 		// TODO: double degreeRounded = Math.round(degree, ROUND_CONVERT_ERROR);
-		double degreeRounded = Double.valueOf(ROUND_CONVERT_ERROR
+		double degreeRounded = Double.valueOf(Constants.ROUND_CONVERT_ERROR
 				.format(degree));
 		double latlon = degreeToLatLon(degreeRounded);
 		return latlon;
 	}
 
 	public static double radianToDegree(double radian) {
-		if (radian < 0 || radian > Pi2) {
+		if (radian < 0 || radian > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianToDegree");
 		}
 
@@ -285,12 +277,12 @@ public class MathUtil {
 		// while(normalized<MinValue) ... normalized += MaxValue;
 
 		double normalized = lon;
-		if (lon < LocationUtil.MIN_LON_VALUE) {
-			double m = lon % LocationUtil.MIN_LON_VALUE;
-			normalized = LocationUtil.MAX_LON_VALUE + m;
-		} else if (lon > LocationUtil.MAX_LON_VALUE) {
-			double m = lon % LocationUtil.MAX_LON_VALUE;
-			normalized = LocationUtil.MIN_LON_VALUE + m;
+		if (lon < Constants.MIN_LON_VALUE) {
+			double m = lon % Constants.MIN_LON_VALUE;
+			normalized = Constants.MAX_LON_VALUE + m;
+		} else if (lon > Constants.MAX_LON_VALUE) {
+			double m = lon % Constants.MAX_LON_VALUE;
+			normalized = Constants.MIN_LON_VALUE + m;
 		}
 
 		return normalized;
@@ -301,15 +293,15 @@ public class MathUtil {
 	// no wrap, because google map dont wrap on lat
 	public static double normalizeLatitude(double lat) {
 		double normalized = lat;
-		if (lat < LocationUtil.MIN_LAT_VALUE) {
+		if (lat < Constants.MIN_LAT_VALUE) {
 			// double m = lat % -LocationUtil.MAX_LAT_VALUE;
 			// normalized = LocationUtil.MAX_LAT_VALUE + m;
-			normalized = LocationUtil.MIN_LAT_VALUE;
+			normalized = Constants.MIN_LAT_VALUE;
 		}
-		if (lat > LocationUtil.MAX_LAT_VALUE) {
+		if (lat > Constants.MAX_LAT_VALUE) {
 			// double m = lat % LocationUtil.MAX_LAT_VALUE;
 			// normalized = -LocationUtil.MAX_LAT_VALUE + m;
-			normalized = LocationUtil.MAX_LAT_VALUE;
+			normalized = Constants.MAX_LAT_VALUE;
 		}
 
 		return normalized;

@@ -5,21 +5,6 @@ import open.source.google.map.clustering.model.ClusterConfiguration;
 import open.source.google.map.clustering.model.Point;
 
 public class LocationUtil {
-	public static final double MIN_LAT_VALUE = -90;
-	public static final double MAX_LAT_VALUE = 90;
-	public static final double MIN_LON_VALUE = -180;
-	public static final double MAX_LON_VALUE = 180;
-
-	public static final double MAX_LAT_LENGTH = 180;
-	public static final double MAX_LON_LENGTH = 360;
-
-	public static final double MAX_LENGTH_WRAP = 180;
-	public static final double MAX_WORD_LENGTH = 360;
-
-	public static final double ANGLE_CONVERT = 180;
-
-	public static final int lAT = 0;
-	public static final int LON = 1;
 
 	// Don't filter when zoomed far out, because user json receive swlon and
 	// nelon values "jumps" to next overlapping lon point
@@ -70,18 +55,18 @@ public class LocationUtil {
 				// sign depended check, todo merge equal lines
 				// - -
 				if (nmaxy <= 0 && nminy <= 0) {
-					isY = nminy <= ny && ny <= MAX_LAT_VALUE
-							|| MIN_LAT_VALUE <= ny && ny <= nmaxy;
+					isY = nminy <= ny && ny <= Constants.MAX_LAT_VALUE
+							|| Constants.MIN_LAT_VALUE <= ny && ny <= nmaxy;
 				}
 				// + +
 				else if (nmaxy >= 0 && nminy >= 0) {
-					isY = nminy <= ny && ny <= MAX_LAT_VALUE
-							|| MIN_LAT_VALUE <= ny && ny <= nmaxy;
+					isY = nminy <= ny && ny <= Constants.MAX_LAT_VALUE
+							|| Constants.MIN_LAT_VALUE <= ny && ny <= nmaxy;
 				}
 				// + -
 				else {
-					isY = nminy <= ny && ny <= MAX_LAT_VALUE
-							|| MIN_LAT_VALUE <= ny && ny <= nmaxy;
+					isY = nminy <= ny && ny <= Constants.MAX_LAT_VALUE
+							|| Constants.MIN_LAT_VALUE <= ny && ny <= nmaxy;
 				}
 			}
 
@@ -97,18 +82,18 @@ public class LocationUtil {
 				// sign depended check, todo merge equal lines
 				// - -
 				if (nmaxx <= 0 && nminx <= 0) {
-					isX = nminx <= nx && nx <= MAX_LON_VALUE
-							|| MIN_LON_VALUE <= nx && nx <= nmaxx;
+					isX = nminx <= nx && nx <= Constants.MAX_LON_VALUE
+							|| Constants.MIN_LON_VALUE <= nx && nx <= nmaxx;
 				}
 				// + +
 				else if (nmaxx >= 0 && nminx >= 0) {
-					isX = nminx <= nx && nx <= MAX_LON_VALUE
-							|| MIN_LON_VALUE <= nx && nx <= nmaxx;
+					isX = nminx <= nx && nx <= Constants.MAX_LON_VALUE
+							|| Constants.MIN_LON_VALUE <= nx && nx <= nmaxx;
 				}
 				// + -
 				else {
-					isX = nminx <= nx && nx <= MAX_LON_VALUE
-							|| MIN_LON_VALUE <= nx && nx <= nmaxx;
+					isX = nminx <= nx && nx <= Constants.MAX_LON_VALUE
+							|| Constants.MIN_LON_VALUE <= nx && nx <= nmaxx;
 				}
 			} else {
 				// normal, no world wrap
@@ -130,12 +115,12 @@ public class LocationUtil {
 		// naive version
 		// while(normalized<MinValue) ... normalized += MaxValue;
 		double normalized = lon;
-		if (lon < MIN_LON_VALUE) {
-			double m = lon % MIN_LON_VALUE;
-			normalized = MAX_LON_VALUE + m;
-		} else if (lon > MAX_LON_VALUE) {
-			double m = lon % MAX_LON_VALUE;
-			normalized = MIN_LON_VALUE + m;
+		if (lon < Constants.MIN_LON_VALUE) {
+			double m = lon % Constants.MIN_LON_VALUE;
+			normalized = Constants.MAX_LON_VALUE + m;
+		} else if (lon > Constants.MAX_LON_VALUE) {
+			double m = lon % Constants.MAX_LON_VALUE;
+			normalized = Constants.MIN_LON_VALUE + m;
 		}
 
 		return normalized;
@@ -146,15 +131,15 @@ public class LocationUtil {
 	// no wrap, because google map dont wrap on lat
 	public static double normalizeLatitude(double lat) {
 		double normalized = lat;
-		if (lat < MIN_LAT_VALUE) {
+		if (lat < Constants.MIN_LAT_VALUE) {
 			// var m = lat % -LatLonInfo.MaxLatValue;
 			// normalized = LatLonInfo.MaxLatValue + m;
-			normalized = MIN_LAT_VALUE;
+			normalized = Constants.MIN_LAT_VALUE;
 		}
-		if (lat > MAX_LAT_VALUE) {
+		if (lat > Constants.MAX_LAT_VALUE) {
 			// var m = lat % LatLonInfo.MaxLatValue;
 			// normalized = -LatLonInfo.MaxLatValue + m;
-			normalized = MAX_LAT_VALUE;
+			normalized = Constants.MAX_LAT_VALUE;
 		}
 
 		return normalized;

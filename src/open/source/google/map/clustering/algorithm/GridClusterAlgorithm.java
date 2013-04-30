@@ -24,6 +24,10 @@ public class GridClusterAlgorithm {
 		this.clusterConfiguration = clusterConfiguration;
 	}
 
+	public GridClusterAlgorithm() {
+		this.clusterConfiguration = Constants.DEFAULT_CONFIGURATION;
+	}
+
 	public List<Point> getClusteredMarkers(List<Point> points,
 			Boundary boundary, int zoomLevel) {
 		delta = LocationUtil
@@ -62,7 +66,7 @@ public class GridClusterAlgorithm {
 	// // Update centroid location to nearest point,
 	// // e.g. if you want to show cluster point on a real existing point area
 	// // O(n)
-	public void updateCentroidToNearestContainingPoint(Bucket bucket) {
+	private void updateCentroidToNearestContainingPoint(Bucket bucket) {
 		if (bucket == null || bucket.getCentroid() == null
 				|| bucket.getPoints() == null || bucket.getPoints().size() == 0) {
 			return;
@@ -268,15 +272,15 @@ public class GridClusterAlgorithm {
 		 * to idx=8 then the longitudes from 170 to -170 will be clustered
 		 * together
 		 */
-		double overlapMapMinX = (int) (LocationUtil.MIN_LON_VALUE / deltax) - 1;
-		double overlapMapMaxX = (int) (LocationUtil.MAX_LON_VALUE / deltax);
+		double overlapMapMinX = (int) (Constants.MIN_LON_VALUE / deltax) - 1;
+		double overlapMapMaxX = (int) (Constants.MAX_LON_VALUE / deltax);
 
 		// The deltaX = 20 example scenario, then set the value 9 to 8 and -10
 		// to -9
 
 		// Similar to if (LatLonInfo.MaxLonValue % deltax == 0) without floating
 		// presicion issue
-		if (Math.abs(LocationUtil.MAX_LON_VALUE % deltax - 0) < Constants.EPSILON) {
+		if (Math.abs(Constants.MAX_LON_VALUE % deltax - 0) < Constants.EPSILON) {
 			overlapMapMaxX--;
 			overlapMapMinX++;
 		}
@@ -285,7 +289,7 @@ public class GridClusterAlgorithm {
 		if (p.getX() < 0)
 			idxx--;
 
-		if (Math.abs(LocationUtil.MAX_LON_VALUE % p.getX() - 0) < Constants.EPSILON) {
+		if (Math.abs(Constants.MAX_LON_VALUE % p.getX() - 0) < Constants.EPSILON) {
 			if (p.getX() < 0)
 				idxx++;
 			else

@@ -1,28 +1,25 @@
 package open.source.google.map.clustering.model;
 
 public class Point {
-	private double latitude;
-	private double longtitude;
+
 	private double x;
 	private double y;
 	private int countCluster;
 	private int markerId;
 	private int markerType;
 
-	public double getLatitude() {
-		return latitude;
+	public Point() {
+
 	}
 
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	public double getLongtitude() {
-		return longtitude;
-	}
-
-	public void setLongtitude(double longtitude) {
-		this.longtitude = longtitude;
+	public Point(double x, double y, int countCluster, int markerId,
+			int markerType) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.countCluster = countCluster;
+		this.markerId = markerId;
+		this.markerType = markerType;
 	}
 
 	public double getX() {

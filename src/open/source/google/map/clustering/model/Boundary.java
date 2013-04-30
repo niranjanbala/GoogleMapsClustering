@@ -4,11 +4,15 @@ import open.source.google.map.clustering.util.MathUtil;
 
 public class Boundary extends Rectangle {
 	public Boundary() {
-		super(0, 0, 0, 0);
+		this(0, 0, 0, 0);
+	}
+
+	public Boundary(double minx, double maxx, double miny, double maxy) {
+		super(minx, miny, maxx, maxy);
 	}
 
 	public Boundary(Boundary b) {
-		super(b.minx, b.miny, b.maxx, b.maxy);
+		this(b.minx, b.miny, b.maxx, b.maxy);
 	}
 
 	// / <summary>
