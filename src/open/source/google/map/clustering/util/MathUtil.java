@@ -3,19 +3,28 @@ package open.source.google.map.clustering.util;
 import open.source.google.map.clustering.model.Point;
 
 public class MathUtil {
+	public static enum DistanceCalculationMethod {
+		DEFAULT, HAVERSINE
+	}
+
 	// Minkowski dist
 	// if lat lon precise dist is needed, use Haversine or similar formulas
 	// is approx calc for clustering, no precise dist is needed
-	public static double distance(Point a, Point b) {
+	public static double distance(Point a, Point b,
+			DistanceCalculationMethod distanceCalculationMethod) {
 		// lat lon wrap, values don't seem needed to be normalized to [0;1] for
 		// better distance calc
-		double absx = latLonDiff(a.getX(), b.getX());
-		double absy = latLonDiff(a.getY(), b.getY());
-
-		return Math.pow(
-				Math.pow(absx, Constants.EXP)
-						+ Math.pow(Math.abs(absy), Constants.EXP),
-				1.0 / Constants.EXP);
+		switch (distanceCalculationMethod) {
+		case HAVERSINE:
+			return haversine(a, b);
+		default:
+			double absx = latLonDiff(a.getX(), b.getX());
+			double absy = latLonDiff(a.getY(), b.getY());
+			return Math.pow(
+					Math.pow(absx, Constants.EXP)
+							+ Math.pow(Math.abs(absy), Constants.EXP),
+					1.0 / Constants.EXP);
+		}
 	}
 
 	// O(1) while loop is maximum 2
@@ -26,7 +35,6 @@ public class MathUtil {
 		while (difference > Constants.MAX_LENGTH_WRAP)
 			difference -= Constants.MAX_WORD_LENGTH;
 		return Math.abs(difference);
-
 		// double differenceAngle = (to - from) % 180; //not working for -170 to
 		// 170
 		// return Math.Abs(differenceAngle);
@@ -64,7 +72,6 @@ public class MathUtil {
 		double dLon = toRadians(lon2 - lon1);
 		lat1 = toRadians(lat1);
 		lat2 = toRadians(lat2);
-
 		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2)
 				* Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
 		double c = 2 * Math.asin(Math.sqrt(a));
@@ -90,12 +97,10 @@ public class MathUtil {
 	public static double half(double d, int halfSteps) {
 		// http://en.wikipedia.org/wiki/Decimal_degrees
 		final double meter11 = 0.0001; // decimal degrees
-
 		double half = d;
 		for (int i = 0; i < halfSteps; i++) {
 			half /= 2;
 		}
-
 		// TODO: double halfRounded = Math.round(half, 4);
 		double halfRounded = Double.valueOf(Constants.FORMATTER.format(half));
 		// avoid grid span less than level
@@ -113,7 +118,6 @@ public class MathUtil {
 		double floor = ((int) (latOrlon / delta)) * delta;
 		if (latOrlon < 0)
 			floor -= delta;
-
 		return floor;
 	}
 
@@ -144,13 +148,11 @@ public class MathUtil {
 		if (b > e) {
 			e += Constants.MAX_LAT_LENGTH;
 		}
-
 		double diff = e - b;
 		if (diff < 0 || diff > Constants.MAX_LAT_LENGTH) {
 			throw new IllegalArgumentException(String.format(
 					"Error AbsLat beg: {%f} end: {%f}", beg, end));
 		}
-
 		return diff;
 	}
 
@@ -166,7 +168,6 @@ public class MathUtil {
 			throw new IllegalArgumentException(String.format(
 					"Error AbsLat beg: {%f} end: {%f}", beg, end));
 		}
-
 		return diff;
 	}
 
@@ -176,11 +177,9 @@ public class MathUtil {
 				|| latlon > Constants.MAX_LON_VALUE) {
 			throw new IllegalArgumentException("Pos");
 		}
-
 		if (latlon < 0) {
 			return latlon + Constants.MAX_WORD_LENGTH;
 		}
-
 		return latlon;
 	}
 
@@ -190,7 +189,6 @@ public class MathUtil {
 				|| latlon > Constants.MAX_LON_VALUE) {
 			throw new IllegalArgumentException("LatLonToDegree");
 		}
-
 		return (latlon + Constants.ANGLE_CONVERT + Constants.MAX_WORD_LENGTH)
 				% Constants.MAX_WORD_LENGTH;
 	}
@@ -199,7 +197,6 @@ public class MathUtil {
 		if (degree < 0 || degree > 360) {
 			throw new IllegalArgumentException("DegreeToLatLon");
 		}
-
 		return (degree - Constants.ANGLE_CONVERT);
 	}
 
@@ -208,7 +205,6 @@ public class MathUtil {
 				|| latlon > Constants.MAX_LON_VALUE) {
 			throw new IllegalArgumentException("LatLonToRadian");
 		}
-
 		double degree = latLonToDegree(latlon);
 		double radian = degreeToRadian(degree);
 		return radian;
@@ -218,7 +214,6 @@ public class MathUtil {
 		if (r < -Constants.PI_SQUARE || r > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianNormalize");
 		}
-
 		double radian = (r + Constants.PI_SQUARE) % Constants.PI_SQUARE;
 		if (radian < 0 || radian > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianNormalize");
@@ -231,12 +226,10 @@ public class MathUtil {
 		if (d < -360 || d > 360) {
 			throw new IllegalArgumentException("DegreeNormalize");
 		}
-
 		double degree = (d + 360) % 360;
 		if (degree < 0 || degree > 360) {
 			throw new IllegalArgumentException("DegreeNormalize");
 		}
-
 		return degree;
 	}
 
@@ -245,7 +238,6 @@ public class MathUtil {
 		if (radian < 0 || radian > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianToLatLon");
 		}
-
 		double degree = degreeNormalize(radianToDegree(radian));
 		// TODO: double degreeRounded = Math.round(degree, ROUND_CONVERT_ERROR);
 		double degreeRounded = Double.valueOf(Constants.ROUND_CONVERT_ERROR
@@ -258,7 +250,6 @@ public class MathUtil {
 		if (radian < 0 || radian > Constants.PI_SQUARE) {
 			throw new IllegalArgumentException("RadianToDegree");
 		}
-
 		return (radian / Math.PI) * 180.0;
 	}
 
@@ -266,7 +257,6 @@ public class MathUtil {
 		if (degree < 0 || degree > 360) {
 			throw new IllegalArgumentException("DegreeToRadian");
 		}
-
 		return (degree * Math.PI) / 180.0;
 	}
 
@@ -275,7 +265,6 @@ public class MathUtil {
 	public static double normalizeLongitude(double lon) {
 		// naive version
 		// while(normalized<MinValue) ... normalized += MaxValue;
-
 		double normalized = lon;
 		if (lon < Constants.MIN_LON_VALUE) {
 			double m = lon % Constants.MIN_LON_VALUE;
@@ -284,7 +273,6 @@ public class MathUtil {
 			double m = lon % Constants.MAX_LON_VALUE;
 			normalized = Constants.MIN_LON_VALUE + m;
 		}
-
 		return normalized;
 	}
 
@@ -303,8 +291,6 @@ public class MathUtil {
 			// normalized = -LocationUtil.MAX_LAT_VALUE + m;
 			normalized = Constants.MAX_LAT_VALUE;
 		}
-
 		return normalized;
 	}
-
 }

@@ -38,7 +38,7 @@ public class GridClusterAlgorithmTest {
 		List<Point> points = new ArrayList<Point>();
 		while (sc.hasNext()) {
 			String p[] = sc.nextLine().split(";");
-			points.add(new Point(Double.valueOf(p[0]), Double.valueOf(p[0]), 1,
+			points.add(new Point(Double.valueOf(p[0]), Double.valueOf(p[0]),
 					Integer.valueOf(p[2]), Integer.valueOf(p[3])));
 
 		}

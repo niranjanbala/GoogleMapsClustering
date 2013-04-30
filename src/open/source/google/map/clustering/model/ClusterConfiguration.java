@@ -1,5 +1,7 @@
 package open.source.google.map.clustering.model;
 
+import open.source.google.map.clustering.util.MathUtil.DistanceCalculationMethod;
+
 public class ClusterConfiguration {
 	private int gridx;// used
 	private int gridy;// used
@@ -14,6 +16,7 @@ public class ClusterConfiguration {
 	private int zoomlevelClusterStop;
 	private String environment;
 	private boolean preClustered;
+	private DistanceCalculationMethod distanceCalculationMethod;
 
 	public ClusterConfiguration(int gridx, int gridy,
 			boolean doShowGridLinesInGoogleMap, int outerGridExtend,
@@ -21,7 +24,8 @@ public class ClusterConfiguration {
 			boolean doMergeGridIfCentroidsAreCloseToEachOther, int mergeWithin,
 			int minClusterSize, int maxMarkersReturned,
 			boolean alwaysClusteringEnabledWhenZoomLevelLess,
-			int zoomlevelClusterStop, String environment, boolean preClustered) {
+			int zoomlevelClusterStop, String environment, boolean preClustered,
+			DistanceCalculationMethod distanceCalculationMethod) {
 		super();
 		this.gridx = gridx;
 		this.gridy = gridy;
@@ -36,6 +40,11 @@ public class ClusterConfiguration {
 		this.zoomlevelClusterStop = zoomlevelClusterStop;
 		this.environment = environment;
 		this.preClustered = preClustered;
+		this.distanceCalculationMethod = distanceCalculationMethod;
+	}
+
+	public DistanceCalculationMethod getDistanceCalculationMethod() {
+		return distanceCalculationMethod;
 	}
 
 	public int getGridx() {

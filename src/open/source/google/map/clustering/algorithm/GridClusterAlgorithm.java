@@ -81,7 +81,8 @@ public class GridClusterAlgorithm {
 		double min = Double.MAX_VALUE;
 		Point nearest = null;
 		for (Point p : points) {
-			double d = MathUtil.distance(from, p);
+			double d = MathUtil.distance(from, p,
+					clusterConfiguration.getDistanceCalculationMethod());
 			if (d >= min) {
 				continue;
 			}
@@ -132,7 +133,8 @@ public class GridClusterAlgorithm {
 				continue;
 			Bucket current = bucketMap.get(currentKey);
 			double dist = MathUtil.distance(current.getCentroid(),
-					neighbor.getCentroid());
+					neighbor.getCentroid(),
+					clusterConfiguration.getDistanceCalculationMethod());
 			if (dist > withinDist)
 				continue;
 			current.getPoints().addAll(neighbor.getPoints());// O(n)
@@ -158,7 +160,7 @@ public class GridClusterAlgorithm {
 		double deltay = delta[1];
 		for (Point p : points) {
 			int pointMappedId[] = null;
-			if (filterData && withinBoundary(p, boundary)) {
+			if (filterData && p.isInside(boundary)) {
 				pointMappedId = getPointMappedIds(p, boundary, deltax, deltay);
 			} else {
 				pointMappedId = getPointMappedIds(p, boundary, deltax, deltay);
@@ -240,9 +242,7 @@ public class GridClusterAlgorithm {
 		}
 		double x = radianToLatLon(radx);
 		double y = radianToLatLon(rady);
-		Point point = new Point();
-		point.setX(x);
-		point.setY(y);
+		Point point = new Point(x, y, 0, 0);
 		point.setCountCluster(count);
 		return point;
 	}
@@ -306,9 +306,5 @@ public class GridClusterAlgorithm {
 		idy = (int) (relativeY / deltay);
 
 		return new int[] { (int) idx, (int) idy };
-	}
-
-	private boolean withinBoundary(Point p, Boundary boundary) {
-		return LocationUtil.IsInside(boundary, p);
 	}
 }

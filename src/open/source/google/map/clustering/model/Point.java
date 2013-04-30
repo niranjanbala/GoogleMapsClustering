@@ -1,5 +1,8 @@
 package open.source.google.map.clustering.model;
 
+import open.source.google.map.clustering.util.Constants;
+import open.source.google.map.clustering.util.MathUtil;
+
 public class Point {
 
 	private double x;
@@ -8,16 +11,11 @@ public class Point {
 	private int markerId;
 	private int markerType;
 
-	public Point() {
-
-	}
-
-	public Point(double x, double y, int countCluster, int markerId,
-			int markerType) {
+	public Point(double x, double y, int markerId, int markerType) {
 		super();
 		this.x = x;
 		this.y = y;
-		this.countCluster = countCluster;
+		this.countCluster = 1;
 		this.markerId = markerId;
 		this.markerType = markerType;
 	}
@@ -60,6 +58,101 @@ public class Point {
 
 	public void setMarkerType(int markerType) {
 		this.markerType = markerType;
+	}
+
+	public void normalize() {
+		this.y = MathUtil.normalizeLatitude(y);
+		this.x = MathUtil.normalizeLongitude(x);
+	}
+
+	// / <summary>
+	// / Lat Lon specific rect boundary check, is x,y inside boundary?
+	// / </summary>
+	// / <param name="minx"></param>
+	// / <param name="miny"></param>
+	// / <param name="maxx"></param>
+	// / <param name="maxy"></param>
+	// / <param name="x"></param>
+	// / <param name="y"></param>
+	// / /// <param name="isInsideDetectedX"></param>
+	// / /// <param name="isInsideDetectedY"></param>
+	// / <returns></returns>
+	public boolean isInside(Boundary boundary, boolean isInsideDetectedX,
+			boolean isInsideDetectedY) {
+		// Normalize because of widen function, world wrapping might have
+		// occured
+		// calc in positive value range only, nb. lon -170 = 10, lat -80 = 10
+		boundary.normalize();
+		this.normalize();
+		double nminx = boundary.getMinx();
+		double nmaxx = boundary.getMaxx();
+
+		double nminy = boundary.getMiny();
+		double nmaxy = boundary.getMaxy();
+
+		double nx = x;
+		double ny = y;
+
+		boolean isX = isInsideDetectedX; // skip checking?
+		boolean isY = isInsideDetectedY;
+
+		if (!isInsideDetectedY) {
+			// world wrap y
+			if (nminy > nmaxy) {
+				// sign depended check, todo merge equal lines
+				// - -
+				if (nmaxy <= 0 && nminy <= 0) {
+					isY = nminy <= ny && ny <= Constants.MAX_LAT_VALUE
+							|| Constants.MIN_LAT_VALUE <= ny && ny <= nmaxy;
+				}
+				// + +
+				else if (nmaxy >= 0 && nminy >= 0) {
+					isY = nminy <= ny && ny <= Constants.MAX_LAT_VALUE
+							|| Constants.MIN_LAT_VALUE <= ny && ny <= nmaxy;
+				}
+				// + -
+				else {
+					isY = nminy <= ny && ny <= Constants.MAX_LAT_VALUE
+							|| Constants.MIN_LAT_VALUE <= ny && ny <= nmaxy;
+				}
+			}
+
+			else {
+				// normal, no world wrap
+				isY = nminy <= ny && ny <= nmaxy;
+			}
+		}
+
+		if (!isInsideDetectedX) {
+			// world wrap x
+			if (nminx > nmaxx) {
+				// sign depended check, todo merge equal lines
+				// - -
+				if (nmaxx <= 0 && nminx <= 0) {
+					isX = nminx <= nx && nx <= Constants.MAX_LON_VALUE
+							|| Constants.MIN_LON_VALUE <= nx && nx <= nmaxx;
+				}
+				// + +
+				else if (nmaxx >= 0 && nminx >= 0) {
+					isX = nminx <= nx && nx <= Constants.MAX_LON_VALUE
+							|| Constants.MIN_LON_VALUE <= nx && nx <= nmaxx;
+				}
+				// + -
+				else {
+					isX = nminx <= nx && nx <= Constants.MAX_LON_VALUE
+							|| Constants.MIN_LON_VALUE <= nx && nx <= nmaxx;
+				}
+			} else {
+				// normal, no world wrap
+				isX = nminx <= nx && nx <= nmaxx;
+			}
+		}
+
+		return isX && isY;
+	}
+
+	public boolean isInside(Boundary b) {
+		return isInside(b, false, false);
 	}
 
 }
