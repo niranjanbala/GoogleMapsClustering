@@ -3,7 +3,7 @@ package open.source.google.map.clustering.model;
 import open.source.google.map.clustering.util.Constants;
 import open.source.google.map.clustering.util.MathUtil;
 
-public class Point {
+public class Point implements IPoint {
 
 	private double x;
 	private double y;
@@ -30,6 +30,7 @@ public class Point {
 		this.displayText = "";
 	}
 
+	@Override
 	public double getX() {
 		return x;
 	}
@@ -38,6 +39,7 @@ public class Point {
 		this.x = x;
 	}
 
+	@Override
 	public double getY() {
 		return y;
 	}

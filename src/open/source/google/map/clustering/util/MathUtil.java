@@ -1,6 +1,6 @@
 package open.source.google.map.clustering.util;
 
-import open.source.google.map.clustering.model.Point;
+import open.source.google.map.clustering.model.IPoint;
 
 public class MathUtil {
 	public static enum DistanceCalculationMethod {
@@ -10,7 +10,7 @@ public class MathUtil {
 	// Minkowski dist
 	// if lat lon precise dist is needed, use Haversine or similar formulas
 	// is approx calc for clustering, no precise dist is needed
-	public static double distance(Point a, Point b,
+	public static double distance(IPoint a, IPoint b,
 			DistanceCalculationMethod distanceCalculationMethod) {
 		// lat lon wrap, values don't seem needed to be normalized to [0;1] for
 		// better distance calc
@@ -40,7 +40,7 @@ public class MathUtil {
 		// return Math.Abs(differenceAngle);
 	}
 
-	public static double haversine(Point p1, Point p2) {
+	public static double haversine(IPoint p1, IPoint p2) {
 		return haversine(p1.getY(), p1.getX(), p2.getY(), p2.getX());
 	}
 

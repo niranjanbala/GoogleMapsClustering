@@ -18,42 +18,6 @@ public class LocationUtil {
 		return zoomLevel >= 3;
 	}
 
-	// ]-180;180]
-	// lon wrap around at value -180 and 180, nb. -180 = 180
-	public static double normalizeLongitude(double lon) {
-		// naive version
-		// while(normalized<MinValue) ... normalized += MaxValue;
-		double normalized = lon;
-		if (lon < Constants.MIN_LON_VALUE) {
-			double m = lon % Constants.MIN_LON_VALUE;
-			normalized = Constants.MAX_LON_VALUE + m;
-		} else if (lon > Constants.MAX_LON_VALUE) {
-			double m = lon % Constants.MAX_LON_VALUE;
-			normalized = Constants.MIN_LON_VALUE + m;
-		}
-
-		return normalized;
-	}
-
-	// [-90;90]
-	// -90 is south pole, 90 is north pole thus -90 != 90
-	// no wrap, because google map dont wrap on lat
-	public static double normalizeLatitude(double lat) {
-		double normalized = lat;
-		if (lat < Constants.MIN_LAT_VALUE) {
-			// var m = lat % -LatLonInfo.MaxLatValue;
-			// normalized = LatLonInfo.MaxLatValue + m;
-			normalized = Constants.MIN_LAT_VALUE;
-		}
-		if (lat > Constants.MAX_LAT_VALUE) {
-			// var m = lat % LatLonInfo.MaxLatValue;
-			// normalized = -LatLonInfo.MaxLatValue + m;
-			normalized = Constants.MAX_LAT_VALUE;
-		}
-
-		return normalized;
-	}
-
 	public static double[] getDelta(Boundary bounday, int zoomLevel,
 			ClusterConfiguration clusterConfiguration) {
 		// Heuristic specific values and grid size dependent.
