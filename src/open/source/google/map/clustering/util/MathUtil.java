@@ -1,11 +1,15 @@
 package open.source.google.map.clustering.util;
 
+import java.text.DecimalFormat;
+
 import open.source.google.map.clustering.model.Point;
 
 public class MathUtil {
 	private static final double Exp = 2; // 2=euclid, 1=manhatten
 	private static final double Pi2 = Math.PI * 2;
-	private static int ROUND_CONVERT_ERROR = 5;
+	private static DecimalFormat FORMATTER = new DecimalFormat("#0.####");
+	private static DecimalFormat ROUND_CONVERT_ERROR = new DecimalFormat(
+			"#0.#####");
 
 	// Minkowski dist
 	// if lat lon precise dist is needed, use Haversine or similar formulas
@@ -99,7 +103,7 @@ public class MathUtil {
 		}
 
 		// TODO: double halfRounded = Math.round(half, 4);
-		double halfRounded = Math.round(half);
+		double halfRounded = Double.valueOf(FORMATTER.format(half));
 		// avoid grid span less than level
 		return halfRounded < meter11 ? meter11 : halfRounded;
 	}
@@ -252,7 +256,8 @@ public class MathUtil {
 
 		double degree = degreeNormalize(radianToDegree(radian));
 		// TODO: double degreeRounded = Math.round(degree, ROUND_CONVERT_ERROR);
-		double degreeRounded = Math.round(degree);
+		double degreeRounded = Double.valueOf(ROUND_CONVERT_ERROR
+				.format(degree));
 		double latlon = degreeToLatLon(degreeRounded);
 		return latlon;
 	}
