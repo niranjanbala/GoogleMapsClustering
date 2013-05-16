@@ -8,7 +8,7 @@ public class Boundary extends Rectangle {
 	}
 
 	public Boundary(double minx, double maxx, double miny, double maxy) {
-		super(minx, miny, maxx, maxy);
+		super(minx, maxx, miny, maxy);
 	}
 
 	public Boundary(Boundary b) {
