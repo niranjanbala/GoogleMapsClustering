@@ -160,7 +160,7 @@ public class BucketMapUtil {
 			if (filterData && p.isInside(boundary)) {
 				pointMappedId = PointUtil.getPointMappedIds(p, boundary,
 						deltax, deltay);
-			} else {
+			} else if (p.isInside(boundary)) {
 				pointMappedId = PointUtil.getPointMappedIds(p, boundary,
 						deltax, deltay);
 			}

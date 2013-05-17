@@ -34,6 +34,7 @@ public class GridClusterAlgorithmTest {
 		for (ClusterPoint r : result) {
 			count += r.getCountCluster();
 		}
+		System.out.println(result.size());
 		assertEquals(totalPoints, count);
 	}
 
@@ -67,16 +68,12 @@ public class GridClusterAlgorithmTest {
 		List<ClusterPoint> result = new GridClusterAlgorithm()
 				.getClusteredMarkers(points, boundary, zoomLevel);
 		int ctotal = 0;
-		for (ClusterPoint p : result) {
-			if (p.isClusterPoint()) {
-				ctotal += p.getCountCluster();
-			} else {
-				ctotal += 1;
-			}
-
+		for (ClusterPoint r : result) {
+			ctotal += r.getCountCluster();
 		}
 		System.out.println(result.size());
 		System.out.println(ctotal);
+		assertEquals(count, ctotal);
 
 	}
 
