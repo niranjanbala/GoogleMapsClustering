@@ -22,7 +22,7 @@ public class GridClusterAlgorithmTest {
 	@Test
 	public void testGetClusteredMarkers() throws Exception {
 		Boundary boundary = new Boundary(Constants.MIN_LON_VALUE,
-				Constants.MIN_LAT_VALUE, Constants.MAX_LON_VALUE,
+				Constants.MAX_LON_VALUE, Constants.MIN_LAT_VALUE,
 				Constants.MAX_LAT_VALUE);
 		List<ClusterPoint> points = readPointsFromCsv();
 		int zoomLevel = 5;
@@ -48,8 +48,28 @@ public class GridClusterAlgorithmTest {
 		Double lat1 = 33.71033395243858;
 		Double lat2 = 33.43801824583935;
 		Double lon1 = -111.53628503796386;
-		Double lot2 = -111.73628503796386;
+		Double lon2 = -111.83628503796386;
 		int zoomLevel = 11;
+		test(array, lat2, lat1, lon2, lon1, zoomLevel);
+	}
+
+	@Test
+	public void testFoo2() throws Exception {
+		JsonArray array = fetchData();
+		/*
+		 * lat1:33.71033395243858 lat2:33.43801824583935
+		 * lon1:-111.53628503796386 lon2:-111.53628503796386
+		 */
+		Double lat1 = 34.95756070569858;
+		Double lat2 = 32.78682872515491;
+		Double lon1 = -107.78239404675293;
+		Double lon2 = -115.27506982800293;
+		int zoomLevel = 11;
+		test(array, lat2, lat1, lon2, lon1, zoomLevel);
+	}
+
+	private void test(JsonArray array, Double lat1, Double lat2, Double lon1,
+			Double lot2, int zoomLevel) {
 		List<ClusterPoint> points = new ArrayList<ClusterPoint>();
 		for (int i = 0; i < array.size(); i++) {
 			points.add(new BusinessPoints(array.get(i).asObject()));
@@ -74,7 +94,6 @@ public class GridClusterAlgorithmTest {
 		System.out.println(result.size());
 		System.out.println(ctotal);
 		assertEquals(count, ctotal);
-
 	}
 
 	private List<ClusterPoint> readPointsFromCsv() throws Exception {

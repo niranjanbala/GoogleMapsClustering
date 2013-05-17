@@ -1,5 +1,6 @@
 package open.source.google.map.clustering.algorithm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import open.source.google.map.clustering.model.Boundary;
@@ -25,7 +26,13 @@ public class GridClusterAlgorithm {
 			Boundary boundary, int zoomLevel) {
 		if (!clusterConfiguration.enableClusteringAlways()
 				&& zoomLevel >= clusterConfiguration.getZoomlevelClusterStop()) {
-			return points;
+			List<ClusterPoint> filteredPoints = new ArrayList<ClusterPoint>();
+			for (ClusterPoint point : points) {
+				if (point.isInside(boundary)) {
+					filteredPoints.add(point);
+				}
+			}
+			return filteredPoints;
 		}
 		return this.bucketMapUtil.getClusterResult(points, boundary, zoomLevel);
 	}

@@ -150,20 +150,18 @@ public class BucketMapUtil {
 
 	private Map<String, Bucket> prepareBucketMap(List<ClusterPoint> points,
 			Boundary boundary, int zoomLevel) {
-		boolean filterData = LocationUtil.canFilterData(zoomLevel);
+		// boolean filterData = LocationUtil.canFilterData(zoomLevel);
 		Map<String, Bucket> bucketMap = new HashMap<String, Bucket>();
 
 		double deltax = delta[0];
 		double deltay = delta[1];
 		for (ClusterPoint p : points) {
-			int pointMappedId[] = null;
-			if (filterData && p.isInside(boundary)) {
-				pointMappedId = PointUtil.getPointMappedIds(p, boundary,
-						deltax, deltay);
-			} else if (p.isInside(boundary)) {
-				pointMappedId = PointUtil.getPointMappedIds(p, boundary,
-						deltax, deltay);
+			if (!p.isInside(boundary)) {
+				continue;
 			}
+			int pointMappedId[] = PointUtil.getPointMappedIds(p, boundary,
+					deltax, deltay);
+
 			if (pointMappedId != null) {
 				String key = PointUtil.getKey(pointMappedId[0],
 						pointMappedId[1]);
